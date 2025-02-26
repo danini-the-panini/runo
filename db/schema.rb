@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_26_091430) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_26_092609) do
+  create_table "games", force: :cascade do |t|
+    t.integer "status", default: 0, null: false
+    t.integer "user_id"
+    t.integer "winner_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_games_on_user_id"
+    t.index ["winner_id"], name: "index_games_on_winner_id"
+  end
+
+  create_table "players", force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_players_on_game_id"
+    t.index ["user_id"], name: "index_players_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -22,4 +41,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_091430) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "players", "games"
+  add_foreign_key "players", "users"
 end

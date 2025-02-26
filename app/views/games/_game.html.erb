@@ -1,0 +1,24 @@
+<div id="<%= dom_id game %>">
+  <h1><%= game.user.email %>'s game</h1>
+
+  <% case game.status %>
+  <% when "lobby" %>
+    <% if game.players.length < 2 %>
+      <h2>Waiting for players...</h2>
+    <% else %>
+      <h2>Ready to start!</h2>
+    <% end %>
+  <% when "playing" %>
+    <h2>playing...</h2>
+  <% when "finished" %>
+    <h2><%= game.winner.email %> wins!</h2>
+  <% when "abandoned" %>
+    <h2>Abandoned!</h2>
+  <% end %>
+
+  <ul>
+    <% game.players.each do |player| %>
+      <li><%= player.user.email %></li>
+    <% end %>
+  </ul>
+</div>
