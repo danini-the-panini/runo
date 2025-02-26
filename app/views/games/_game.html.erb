@@ -8,7 +8,7 @@
     <% else %>
       <h2>Ready to start!</h2>
       <% if game.user == current_user %>
-        <%= button_to 'Start!', @game, method: :patch %>
+        <%= button_to 'Start!', game, method: :patch %>
       <% end %>
     <% end %>
 
@@ -20,6 +20,8 @@
       <%= button_to 'Join!', game_players_path(game) %>
     <% end %>
   <% when "playing" %>
+    <% your_turn = game.current_player.user == current_user %>
+    <% can_draw = your_turn && (game.plus > 0 || game.current_player.cards.all?{ !game.place?(it) }) %>
     <h2>
       <% if game.current_player.user == current_user %>
         Your turn!
@@ -27,6 +29,21 @@
         <%= game.current_player.user.email %>'s turn
       <% end %>
     </h2>
+    <div>
+      <% if game.plus > 0 %>
+        Stack: <%= game.plus %>
+      <% end %>
+    </div>
+    <div>
+      <% if game.dir.negative? %>
+        Reversed!
+      <% end %>
+    </div>
+    <div>
+      <% if game.top.wild? %>
+        Color: <%= game.color %>
+      <% end %>
+    </div>
     <div class="play-area">
       <div class="discard">
         <div class="deck-stack" style="width: <%= (game.discard.length-1)*0.5 %>px"></div>
@@ -36,15 +53,46 @@
       </div>
       <div class="deck">
         <div class="deck-stack" style="width: <%= (game.deck.length-1)*0.5 %>px"></div>
-        <div class="card deck-card">
-          <%= inline_svg("cards/back.svg") %>
+        <div class="card deck-next-card"><%= inline_svg("cards/back.svg") %></div>
+        <div class="card deck-card <%= class_names(playable: can_draw) %>">
+          <% if can_draw %>
+            <%= button_to game_turn_path(game, play: 'draw'), class: 'card-button', form: { class: 'card-form' } do %>
+              <%= inline_svg("cards/back.svg") %>
+            <% end %>
+          <% else %>
+            <%= inline_svg("cards/back.svg") %>
+          <% end %>
         </div>
       </div>
     </div>
     <ul class="cards">
       <% game.players.find_by(user: current_user).cards.each do |card| %>
-        <li class="card card-<%= card.color %>">
-          <%= inline_card(card) %>
+        <li data-controller="card" class="
+          card
+          card-<%= card.color %>
+          <%= class_names(
+            playable: your_turn && game.place?(card),
+            unplayable: your_turn && !game.place?(card)
+          ) %>
+        ">
+          <% if your_turn && game.place?(card) %>
+            <% if card.wild? %>
+              <button data-action="card#open" class="card-button">
+                <%= inline_card(card) %>
+              </button>
+              <dialog data-card-target="dialog">
+                <% Card::COLORS.each do |color| %>
+                  <%= button_to color.capitalize, game_turn_path(game, play: 'card', card_id: card.id, color:) %>
+                <% end %>
+              </dialog>
+            <% else %>
+              <%= button_to game_turn_path(game, play: 'card', card_id: card.id), class: 'card-button', form: { class: 'card-form' } do %>
+                <%= inline_card(card) %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <%= inline_card(card) %>
+          <% end %>
         </li>
       <% end %>
     </ul>
@@ -61,6 +109,6 @@
   </ul>
 
   <% if game.status.in?(%w[lobby playing]) && game.user == current_user %>
-    <%= button_to "Abandon", @game, method: :delete %>
+    <%= button_to "Abandon", game, method: :delete %>
   <% end %>
 </div>

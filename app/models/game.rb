@@ -44,7 +44,11 @@ class Game < ApplicationRecord
   attribute :deck, Card.to_array_type
   attribute :discard, Card.to_array_type
 
+  enum :color, Card.colors.keys
+
   before_create :shuffle_deck
+
+  after_update :broadcast
 
   def start!
     deal
@@ -55,8 +59,38 @@ class Game < ApplicationRecord
     discard.first
   end
 
+  def place?(card)
+    top.place?(card, plus > 0, color)
+  end
+
+  def draw
+    card = deck.shift
+    if deck.empty?
+      top_discard = discard.slice!(0, 1)
+      self.deck = discard.shuffle
+      deck.each do |card|
+        card.color = 'wild' if card.wild?
+      end
+    end
+    card
+  end
+
   def current_player
     players.order(created_at: :asc)[player_index]
+  end
+
+  def next_player
+    self.player_index = (self.player_index + self.dir) % players.length
+  end
+
+  def reverse
+    self.dir *= -1
+  end
+
+  def broadcast
+    users.each do |user|
+      broadcast_replace_to "game_#{id}_#{user.id}", locals: { current_user: user }
+    end
   end
 
   private
@@ -78,18 +112,6 @@ class Game < ApplicationRecord
       players.each(&:save!)
       discard.unshift(deck.shift)
       discard.unshift(deck.shift) while discard.first.wild?
-    end
-
-    def draw
-      card = deck.shift
-      if deck.empty?
-        top_discard = discard.slice!(0, 1)
-        self.deck = discard.shuffle
-        deck.each do |card|
-          card.color = 'wild' if card.wild?
-        end
-      end
-      card
     end
 
 end

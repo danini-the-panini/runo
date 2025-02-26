@@ -1,4 +1,4 @@
-<p style="color: green"><%= notice %></p>
+<%= turbo_stream_from "game_#{@game.id}_#{current_user.id}" %>
 
 <%= render @game %>
 

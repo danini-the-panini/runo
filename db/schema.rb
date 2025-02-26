@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_26_130451) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_26_181120) do
   create_table "games", force: :cascade do |t|
     t.integer "status", default: 0, null: false
     t.integer "user_id"
@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_130451) do
     t.integer "player_index", default: 1, null: false
     t.integer "plus", default: 0, null: false
     t.integer "dir", default: 1, null: false
+    t.integer "color"
     t.index ["user_id"], name: "index_games_on_user_id"
     t.index ["winner_id"], name: "index_games_on_winner_id"
   end

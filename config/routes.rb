@@ -8,5 +8,6 @@ Rails.application.routes.draw do
 
   resources :games, only: %i[show create update destroy] do
     resource :players, only: %i[create destroy]
+    resource :turn, only: :create
   end
 end

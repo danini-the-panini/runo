@@ -12,22 +12,23 @@ class Card
 
   def initialize(...)
     super
-    self.id = SecureRandom.uuid
+    self.id ||= SecureRandom.uuid
   end
 
   def plus?
     plus > 0
   end
 
-  def place?(other, on_plus = false)
+  def place?(other, on_plus = false, wild_color = nil)
     return false if other.nil?
+    self_color = wild? ? wild_color : color
 
     if plus? && on_plus
-      ((other.color == color || other.wild?) && other.plus >= plus) || (other.plus == plus)
+      ((other.color == self_color || other.wild?) && other.plus >= plus) || (other.plus == plus)
     else
       return true if other.wild?
 
-      color == other.color || face == other.face
+      self_color == other.color || face == other.face
     end
   end
 end
