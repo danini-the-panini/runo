@@ -3,11 +3,17 @@ class Card
 
   COLORS = %i[red yellow blue green]
 
+  attribute :id, :string
   attribute :face, :string
   attribute :plus, :integer, default: 0
   enum :color, [*COLORS, :wild]
 
   validates :face, :plus, :color, presence: true
+
+  def initialize(...)
+    super
+    self.id = SecureRandom.uuid
+  end
 
   def plus?
     plus > 0

@@ -12,7 +12,7 @@ class Game < ApplicationRecord
         *2.times.flat_map do
           [
             Card.new(color: c, face: 'skip'),
-            Card.new(color: c, face: 'revrse'),
+            Card.new(color: c, face: 'reverse'),
             Card.new(color: c, face: 'plus', plus: 2)
           ]
         end
@@ -51,6 +51,14 @@ class Game < ApplicationRecord
     playing!
   end
 
+  def top
+    discard.first
+  end
+
+  def current_player
+    players.order(created_at: :asc)[player_index]
+  end
+
   private
 
     def enough_players
@@ -82,10 +90,6 @@ class Game < ApplicationRecord
         end
       end
       card
-    end
-
-    def top
-      discard.first
     end
 
 end

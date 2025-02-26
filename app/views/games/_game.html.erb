@@ -20,12 +20,32 @@
       <%= button_to 'Join!', game_players_path(game) %>
     <% end %>
   <% when "playing" %>
-    <h2>playing...</h2>
-    <p>Deck: <%= pluralize(game.deck.size, 'card') %>
-    <p>Cards:</p>
-    <ul>
+    <h2>
+      <% if game.current_player.user == current_user %>
+        Your turn!
+      <% else %>
+        <%= game.current_player.user.email %>'s turn
+      <% end %>
+    </h2>
+    <div class="play-area">
+      <div class="discard">
+        <div class="deck-stack" style="width: <%= (game.discard.length-1)*0.5 %>px"></div>
+        <div class="discard-card card card-<%= game.top.color %>">
+          <%= inline_card(game.top) %>
+        </div>
+      </div>
+      <div class="deck">
+        <div class="deck-stack" style="width: <%= (game.deck.length-1)*0.5 %>px"></div>
+        <div class="card deck-card">
+          <%= inline_svg("cards/back.svg") %>
+        </div>
+      </div>
+    </div>
+    <ul class="cards">
       <% game.players.find_by(user: current_user).cards.each do |card| %>
-        <pre><%= card.inspect %></pre>
+        <li class="card card-<%= card.color %>">
+          <%= inline_card(card) %>
+        </li>
       <% end %>
     </ul>
   <% when "finished" %>
