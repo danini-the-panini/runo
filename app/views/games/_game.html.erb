@@ -7,9 +7,27 @@
       <h2>Waiting for players...</h2>
     <% else %>
       <h2>Ready to start!</h2>
+      <% if game.user == current_user %>
+        <%= button_to 'Start!', @game, method: :patch %>
+      <% end %>
+    <% end %>
+
+    <% if game.users.include?(current_user) %>
+      <% if game.user != current_user %>
+        <%= button_to 'Leave', game_players_path(game), method: :delete %>
+      <% end %>
+    <% else %>
+      <%= button_to 'Join!', game_players_path(game) %>
     <% end %>
   <% when "playing" %>
     <h2>playing...</h2>
+    <p>Deck: <%= pluralize(game.deck.size, 'card') %>
+    <p>Cards:</p>
+    <ul>
+      <% game.players.find_by(user: current_user).cards.each do |card| %>
+        <pre><%= card.inspect %></pre>
+      <% end %>
+    </ul>
   <% when "finished" %>
     <h2><%= game.winner.email %> wins!</h2>
   <% when "abandoned" %>
@@ -21,4 +39,8 @@
       <li><%= player.user.email %></li>
     <% end %>
   </ul>
+
+  <% if game.status.in?(%w[lobby playing]) && game.user == current_user %>
+    <%= button_to "Abandon", @game, method: :delete %>
+  <% end %>
 </div>

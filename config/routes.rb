@@ -6,5 +6,7 @@ Rails.application.routes.draw do
 
   root "home#index"
 
-  resources :games, only: %i[show create destroy]
+  resources :games, only: %i[show create update destroy] do
+    resource :players, only: %i[create destroy]
+  end
 end
