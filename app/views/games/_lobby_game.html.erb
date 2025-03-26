@@ -1,0 +1,5 @@
+<li id="game_<%= game.id %>">
+  <%= link_to game do %>
+    #<%= game.id %> - <%= pluralize(game.players.length, 'player') %>
+  <% end %>
+</li>

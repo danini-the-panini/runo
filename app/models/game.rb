@@ -48,6 +48,7 @@ class Game < ApplicationRecord
 
   before_create :shuffle_deck
 
+  after_create :broadcast_to_lobby
   after_update :broadcast
 
   def start!
@@ -88,9 +89,18 @@ class Game < ApplicationRecord
   end
 
   def broadcast
+    if abandoned?
+      broadcast_remove_to "games", target: "game_#{id}"
+    else
+      broadcast_replace_to "games", target: "game_#{id}", partial: "games/lobby_game", locals: { game: self }
+    end
     users.each do |user|
       broadcast_replace_to "game_#{id}_#{user.id}", locals: { current_user: user }
     end
+  end
+
+  def broadcast_to_lobby
+    broadcast_append_to "games", partial: "games/lobby_game", locals: { game: self }
   end
 
   private
