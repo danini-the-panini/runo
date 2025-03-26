@@ -44,6 +44,27 @@
         Color: <%= game.color %>
       <% end %>
     </div>
+    <div class="players-area">
+      <div class="players-list">
+        <% game.players.reject { |p| p.user == current_user }.each do |player| %>
+          <div class="player <%= 'current-player' if game.current_player == player %>">
+            <div class="player-info">
+              <strong><%= player.user.email %></strong>
+              <% if game.current_player == player %>
+                <span class="turn-indicator">Current Turn</span>
+              <% end %>
+            </div>
+            <ul class="other-player-cards">
+              <% player.cards.each_with_index do |card, index| %>
+                <li class="card other-player-card" style="left: <%= index * 15 %>px">
+                  <%= inline_svg("cards/back.svg") %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    </div>
     <div class="play-area">
       <div class="discard">
         <div class="deck-stack" style="width: <%= (game.discard.length-1)*0.5 %>px"></div>
@@ -102,11 +123,7 @@
     <h2>Abandoned!</h2>
   <% end %>
 
-  <ul>
-    <% game.players.each do |player| %>
-      <li><%= player.user.email %></li>
-    <% end %>
-  </ul>
+
 
   <% if game.status.in?(%w[lobby playing]) && game.user == current_user %>
     <%= button_to "Abandon", game, method: :delete %>

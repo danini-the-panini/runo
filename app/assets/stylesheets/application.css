@@ -27,8 +27,6 @@ svg {
   position: relative;
 }
 
-.deck-stack {
-}
 
 .deck-stack::before {
   content: '';
@@ -101,4 +99,73 @@ svg {
 
 .card.unplayable {
   filter: grayscale(0.5) brightness(0.5) contrast(0.5);
+}
+
+.players-area {
+  margin: 1rem 0;
+  padding: 0.5rem;
+}
+
+.players-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #eee;
+  min-width: 150px;
+}
+
+.player.current-player {
+  border: 1px solid #ffcc00;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.player-info strong {
+  margin-right: 0.5rem;
+}
+
+.turn-indicator {
+  background-color: #ffcc00;
+  color: #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.other-player-cards {
+  list-style: none;
+  margin: 0.5rem 0 0 0;
+  padding: 0;
+  display: flex;
+  position: relative;
+  height: 3.5rem;
+}
+
+.other-player-card {
+  position: absolute;
+  transition: transform 150ms ease-in-out;
+}
+
+.other-player-card svg {
+  width: 3.5rem;
+  height: auto;
+}
+
+.other-player-card:hover {
+  transform: translateY(-0.5rem);
+  z-index: 10;
 }
