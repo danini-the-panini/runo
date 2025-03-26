@@ -12,6 +12,12 @@
       <% end %>
     <% end %>
 
+    <ul>
+      <% game.players.each do |player| %>
+        <li><%= player.user.email %></li>
+      <% end %>
+    </ul>
+
     <% if game.users.include?(current_user) %>
       <% if game.user != current_user %>
         <%= button_to 'Leave', game_players_path(game), method: :delete %>
@@ -46,7 +52,7 @@
     </div>
     <div class="players-area">
       <div class="players-list">
-        <% game.players.reject { |p| p.user == current_user }.each do |player| %>
+        <% game.players.reject { it.user == current_user }.each do |player| %>
           <div class="player <%= 'current-player' if game.current_player == player %>">
             <div class="player-info">
               <strong><%= player.user.email %></strong>
@@ -55,8 +61,8 @@
               <% end %>
             </div>
             <ul class="other-player-cards">
-              <% player.cards.each_with_index do |card, index| %>
-                <li class="card other-player-card" style="left: <%= index * 15 %>px">
+              <% player.cards.each do |card| %>
+                <li class="card other-player-card">
                   <%= inline_svg("cards/back.svg") %>
                 </li>
               <% end %>
@@ -122,8 +128,6 @@
   <% when "abandoned" %>
     <h2>Abandoned!</h2>
   <% end %>
-
-
 
   <% if game.status.in?(%w[lobby playing]) && game.user == current_user %>
     <%= button_to "Abandon", game, method: :delete %>

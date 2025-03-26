@@ -98,7 +98,8 @@ svg {
 }
 
 .card.unplayable {
-  filter: grayscale(0.5) brightness(0.5) contrast(0.5);
+  opacity: 0.2;
+  cursor: not-allowed;
 }
 
 .players-area {
@@ -109,7 +110,7 @@ svg {
 .players-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 3rem;
   justify-content: center;
 }
 
@@ -120,7 +121,8 @@ svg {
   padding: 0.5rem;
   border-radius: 0.5rem;
   border: 1px solid #eee;
-  min-width: 150px;
+  min-width: 10rem;
+  width: 16rem;
 }
 
 .player.current-player {
@@ -151,21 +153,16 @@ svg {
   margin: 0.5rem 0 0 0;
   padding: 0;
   display: flex;
-  position: relative;
   height: 3.5rem;
+  width: 100%;
 }
 
 .other-player-card {
-  position: absolute;
-  transition: transform 150ms ease-in-out;
+  margin-right: -2.8rem;
+  z-index: 1;
 }
 
 .other-player-card svg {
   width: 3.5rem;
   height: auto;
-}
-
-.other-player-card:hover {
-  transform: translateY(-0.5rem);
-  z-index: 10;
 }
