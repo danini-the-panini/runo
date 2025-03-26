@@ -34,26 +34,20 @@ class TurnsController < ApplicationController
           @game.plus = 0
           player.save!
           end_turn = true
-        else
-          if player.cards.all? { !@game.place?(it) }
-            draw = @game.draw
-            if @game.place?(draw)
-              @game.discard.unshift(draw)
-            else
-              player.cards << draw
-              player.save!
-            end
-            end_turn = true
-          end
+        elsif player.cards.all? { !@game.place?(it) }
+          draw = @game.draw
+          player.cards << draw
+          player.save!
+          end_turn = true unless @game.place?(draw)
         end
       end
     end
 
     if end_turn
       @game.next_player
-      @game.save!
     end
 
+    @game.save!
     redirect_to @game
   end
 
