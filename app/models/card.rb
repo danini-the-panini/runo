@@ -21,14 +21,21 @@ class Card
 
   def place?(other, on_plus = false, wild_color = nil)
     return false if other.nil?
+
     self_color = wild? ? wild_color : color
 
-    if plus? && on_plus
-      ((other.color == self_color || other.wild?) && other.plus >= plus) || (other.plus == plus)
-    else
-      return true if other.wild?
+    return other.plus >= plus if plus? && on_plus
+    return true if other.wild?
 
-      self_color == other.color || face == other.face
+    self_color == other.color || same_face?(other)
+  end
+
+  def same_face?(other)
+    if plus?
+      plus == other.plus
+    else
+      face == other.face
     end
   end
+
 end
