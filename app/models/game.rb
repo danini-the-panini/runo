@@ -8,7 +8,7 @@ class Game < ApplicationRecord
     end,
     *Card::COLORS.flat_map do |c|
       [
-        Card.new(color: c, face: '0'),
+       Card.new(color: c, face: '0'),
         *2.times.flat_map do
           [
             Card.new(color: c, face: 'skip'),
@@ -80,6 +80,12 @@ class Game < ApplicationRecord
     players.order(created_at: :asc)[player_index]
   end
 
+  def last_player
+    return nil if last_player_index.nil?
+
+    players.order(created_at: :asc)[last_player_index]
+  end
+
   def next_player
     self.player_index = (self.player_index + self.dir) % players.length
   end
@@ -95,7 +101,7 @@ class Game < ApplicationRecord
       broadcast_replace_to "games", target: "game_#{id}", partial: "games/lobby_game", locals: { game: self }
     end
     users.each do |user|
-      broadcast_replace_to "game_#{id}_#{user.id}", locals: { current_user: user }
+      broadcast_replace_to "game_#{id}_#{user.id}", locals: { current_user: user, last_play: last_player && last_player.user != user }
     end
   end
 

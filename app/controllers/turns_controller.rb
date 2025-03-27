@@ -6,6 +6,8 @@ class TurnsController < ApplicationController
   def create
     end_turn = false
     if @game.current_player.user == current_user
+      @game.last_player_index = @game.player_index
+      @game.last_play = params.permit(:play, :color, :card_id).to_h
       case params[:play]
       when 'card'
         if @game.place?(card) && (!card.wild? || params[:color].present?)
@@ -30,11 +32,13 @@ class TurnsController < ApplicationController
         end
       when 'draw'
         if @game.plus > 0
+          @game.last_play[:draw] = @game.plus
           @game.plus.times { player.cards << @game.draw }
           @game.plus = 0
           player.save!
           end_turn = true
         elsif player.cards.all? { !@game.place?(it) }
+          @game.last_play[:draw] = 1
           draw = @game.draw
           player.cards << draw
           player.save!

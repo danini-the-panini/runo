@@ -1,4 +1,7 @@
-<div id="<%= dom_id game %>">
+<% last_play = local_assigns[:last_play] ? game.last_play.merge(player: game.last_player).symbolize_keys : {}  %>
+
+<div id="<%= dom_id game %>" data-controller="game">
+  <pre><%= last_play.inspect %></pre>
   <h1><%= game.user.email %>'s game</h1>
 
   <% case game.status %>
@@ -60,9 +63,11 @@
                 <span class="turn-indicator">Current Turn</span>
               <% end %>
             </div>
-            <ul class="other-player-cards">
-              <% player.cards.each do |card| %>
-                <li class="card other-player-card">
+            <ul class="other-player-cards" data-game-target="otherPlayerCards" data-player="<%= player.id %>">
+              <% drawn = last_play[:player] == player && last_play[:play] == 'draw' %>
+              <% player.cards.each.with_index do |card, index| %>
+                <% draw = drawn && index >= player.cards.count - last_play[:draw] %>
+                <li class="card other-player-card <%= draw ? 'drawn' : '' %>" data-game-target="otherCard" data-drawn="<%= draw.to_s %>">
                   <%= inline_svg("cards/back.svg") %>
                 </li>
               <% end %>
@@ -74,16 +79,17 @@
     <div class="play-area">
       <div class="discard">
         <div class="deck-stack" style="width: <%= (game.discard.length-1)*0.5 %>px"></div>
-        <div class="discard-card card card-<%= game.top.color %>">
+        <% played_card = last_play[:play] == 'card' && last_play[:player].user != current_user %>
+        <div class="discard-card card card-<%= game.top.color %>" data-game-target="discard" data-player="<%= played_card ? last_play[:player].id : '' %>">
           <%= inline_card(game.top) %>
         </div>
       </div>
       <div class="deck">
         <div class="deck-stack" style="width: <%= (game.deck.length-1)*0.5 %>px"></div>
         <div class="card deck-next-card"><%= inline_svg("cards/back.svg") %></div>
-        <div class="card deck-card <%= class_names(playable: can_draw) %>">
+        <div class="card deck-card <%= class_names(playable: can_draw) %>" data-game-target="deck">
           <% if can_draw %>
-            <%= button_to game_turn_path(game, play: 'draw'), class: 'card-button', form: { class: 'card-form' } do %>
+            <%= button_to game_turn_path(game, play: 'draw'), class: 'card-button', form: { class: 'card-form' }, data: { action: 'game#draw' } do %>
               <%= inline_svg("cards/back.svg") %>
             <% end %>
           <% else %>
@@ -92,7 +98,7 @@
         </div>
       </div>
     </div>
-    <ul class="cards">
+    <ul class="cards" data-game-target="playerCards">
       <% game.players.find_by(user: current_user).cards.each do |card| %>
         <li data-controller="card" class="
           card
@@ -109,11 +115,11 @@
               </button>
               <dialog data-card-target="dialog">
                 <% Card::COLORS.each do |color| %>
-                  <%= button_to color.capitalize, game_turn_path(game, play: 'card', card_id: card.id, color:) %>
+                  <%= button_to color.capitalize, game_turn_path(game, play: 'card', card_id: card.id, color:, data: { action: 'game#play' }) %>
                 <% end %>
               </dialog>
             <% else %>
-              <%= button_to game_turn_path(game, play: 'card', card_id: card.id), class: 'card-button', form: { class: 'card-form' } do %>
+              <%= button_to game_turn_path(game, play: 'card', card_id: card.id), class: 'card-button', form: { class: 'card-form' }, data: { action: 'game#play' } do %>
                 <%= inline_card(card) %>
               <% end %>
             <% end %>
