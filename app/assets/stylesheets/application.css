@@ -57,6 +57,21 @@ main {
   height: 8rem;
 }
 
+.session-links {
+  margin-top: 8rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.session-links a {
+  border: 0.4rem solid white;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: yellow;
+  font-weight: bold;
+}
+
 svg {
  display: block;
  width: auto;

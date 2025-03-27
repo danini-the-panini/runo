@@ -25,4 +25,8 @@
   <%= button_to 'New game', games_path %>
 <% else %>
   <div class="logo"><%= inline_svg('logo.svg') %></div>
+  <div class="session-links">
+    <%= link_to "Sign up", new_user_registration_path %>
+    <%= link_to "Sign in", new_user_session_path %>
+  </div>
 <% end %>
