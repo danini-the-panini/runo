@@ -1,7 +1,6 @@
 <% last_play = local_assigns[:last_play] ? game.last_play.merge(player: game.last_player).symbolize_keys : {}  %>
 
 <div id="<%= dom_id game %>" data-controller="game">
-  <pre><%= last_play.inspect %></pre>
   <h1><%= game.user.email %>'s game</h1>
 
   <% case game.status %>

@@ -1,21 +1,28 @@
-<%= turbo_stream_from "games" %>
 
-<h1>Games</h1>
+<% if user_signed_in? %>
+  <%= turbo_stream_from "games" %>
 
-<h2>Your games</h2>
-<% if @your_games.present? %>
-  <ul id="your_games">
-    <% @your_games.each do |game| %>
+  <div class="logo logo-small"><%= inline_svg('logo.svg') %></div>
+
+  <h2>Games</h2>
+
+  <h3>Your games</h3>
+  <% if @your_games.present? %>
+    <ul id="your_games">
+      <% @your_games.each do |game| %>
+        <%= render partial: "games/lobby_game", locals: { game: game } %>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <h3>Lobby</h3>
+  <ul id="games">
+    <% @games.each do |game| %>
       <%= render partial: "games/lobby_game", locals: { game: game } %>
     <% end %>
   </ul>
+
+  <%= button_to 'New game', games_path %>
+<% else %>
+  <div class="logo"><%= inline_svg('logo.svg') %></div>
 <% end %>
-
-<h2>Lobby</h2>
-<ul id="games">
-  <% @games.each do |game| %>
-    <%= render partial: "games/lobby_game", locals: { game: game } %>
-  <% end %>
-</ul>
-
-<%= button_to 'New game', games_path %>
