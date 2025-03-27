@@ -5,7 +5,20 @@ class TurnsController < ApplicationController
   
   def create
     end_turn = false
-    if @game.current_player.user == current_user
+    if params[:play] == 'runo'
+      player.update!(runo: true)
+      @game.last_player_index = @game.player_index_of(player)
+      @game.last_play = { play: 'runo' }
+    elsif params[:play] == 'not_runo'
+      other_player = @game.players.find(params[:player_id])
+      unless other_player.runo?
+        @game.last_player_index = @game.player_index_of(player)
+        @game.last_play = { play: 'not_runo' }
+        2.times { other_player.cards << @game.draw }
+      end
+      other_player.update!(runo: true)
+    elsif @game.current_player.user == current_user
+      player.update!(runo: false)
       @game.last_player_index = @game.player_index
       @game.last_play = params.permit(:play, :color, :card_id).to_h
       case params[:play]

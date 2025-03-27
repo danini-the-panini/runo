@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_27_081812) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_27_143827) do
   create_table "games", force: :cascade do |t|
     t.integer "status", default: 0, null: false
     t.integer "user_id"
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_081812) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "cards", default: [], null: false
+    t.boolean "runo", default: false, null: false
     t.index ["game_id"], name: "index_players_on_game_id"
     t.index ["user_id"], name: "index_players_on_user_id"
   end

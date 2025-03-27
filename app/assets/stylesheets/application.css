@@ -184,6 +184,7 @@ svg {
   border: 1px solid #eee;
   min-width: 10rem;
   width: 16rem;
+  position: relative;
 }
 
 .player.current-player {
@@ -226,4 +227,77 @@ svg {
 .other-player-card svg {
   width: 3.5rem;
   height: auto;
+}
+
+.my-hand {
+  position: relative;
+}
+
+.runo-button {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  border: 0.5rem solid red;
+  z-index: 10;
+  border-radius: 1rem;
+  box-shadow: 0 0 1rem 1rem rgba(0 0 0 / 50%);
+  padding: 0.5rem 1rem;
+  width: max-content;
+  z-index: 100;
+}
+
+.runo {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.75rem;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+  z-index: 1;
+  width: max-content;
+}
+
+.runo::before {
+  content: '';
+  inset: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #C60001;
+  border-radius: 0.5rem;
+  transform: scale(100%);
+  opacity: 1;
+  z-index: 0;
+  border: 0.25rem dashed black;
+  transition: transform 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+
+.runo::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 7px solid transparent;
+  border-top: 7px solid white;
+  border-right: 7px solid white;
+  top: 100%;
+  left: 50%;
+  margin-top: -0.5rem;
+  transform: translateX(-50%) rotate(135deg);
+}
+
+.runo.animated::before {
+  transform: scale(300%);
+  opacity: 0;
+}
+
+.runo.disappear {
+  opacity: 0;
 }

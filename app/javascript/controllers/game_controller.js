@@ -1,9 +1,23 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ['deck', 'discard', 'playerCards', 'otherPlayerCards', 'otherCard']
+  static targets = ['deck', 'discard', 'playerCards', 'otherPlayerCards', 'otherCard', 'runo']
+
+  runoTargetConnected(runo) {
+    requestAnimationFrame(() => {
+      runo.classList.add('animated')
+      setTimeout(() => {
+        runo.classList.add('disappear')
+        setTimeout(() => {
+          runo.remove()
+        }, 300)
+      }, 1000)
+    })
+  }
 
   connect() {
+    if (!this.hasDeckTarget) return
+
     const deckBounds = this.deckTarget.getBoundingClientRect()
     let i = 0
     for (let card of this.otherCardTargets) {

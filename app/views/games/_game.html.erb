@@ -1,4 +1,5 @@
 <% last_play = local_assigns[:last_play] ? game.last_play.merge(player: game.last_player).symbolize_keys : {}  %>
+<% current_user_player = game.players.find_by(user: current_user) %>
 
 <div id="<%= dom_id game %>" data-controller="game">
   <h1><%= game.user.email %>'s game</h1>
@@ -61,6 +62,9 @@
               <% if game.current_player == player %>
                 <span class="turn-indicator">Current Turn</span>
               <% end %>
+              <% if player.cards.size == 1 && !player.runo? %>
+                <%= button_to 'You didn\'t say rUNO!', game_turn_path(game, play: 'not_runo', player_id: player.id), class: 'runo-button' %>
+              <% end %>
             </div>
             <ul class="other-player-cards" data-game-target="otherPlayerCards" data-player="<%= player.id %>">
               <% drawn = last_play[:player] == player && last_play[:play] == 'draw' %>
@@ -71,6 +75,15 @@
                 </li>
               <% end %>
             </ul>
+            <% if last_play[:player] == player && last_play[:play].end_with?('runo') %>
+              <div class="runo" data-game-target="runo">
+                <% if last_play[:play] == 'runo' %>
+                  rUNO!
+                <% else %>
+                  You didn't say rUNO!
+                <% end %>
+              </div>
+            <% end %>
           </div>
         <% end %>
       </div>
@@ -97,37 +110,42 @@
         </div>
       </div>
     </div>
-    <ul class="cards" data-game-target="playerCards">
-      <% game.players.find_by(user: current_user).cards.each do |card| %>
-        <li data-controller="card" class="
-          card
-          card-<%= card.color %>
-          <%= class_names(
-            playable: your_turn && game.place?(card),
-            unplayable: your_turn && !game.place?(card)
-          ) %>
-        ">
-          <% if your_turn && game.place?(card) %>
-            <% if card.wild? %>
-              <button data-action="card#open" class="card-button">
-                <%= inline_card(card) %>
-              </button>
-              <dialog data-card-target="dialog">
-                <% Card::COLORS.each do |color| %>
-                  <%= button_to color.capitalize, game_turn_path(game, play: 'card', card_id: card.id, color:, data: { action: 'game#play' }) %>
-                <% end %>
-              </dialog>
-            <% else %>
-              <%= button_to game_turn_path(game, play: 'card', card_id: card.id), class: 'card-button', form: { class: 'card-form' }, data: { action: 'game#play' } do %>
-                <%= inline_card(card) %>
-              <% end %>
-            <% end %>
-          <% else %>
-            <%= inline_card(card) %>
-          <% end %>
-        </li>
+    <div class="my-hand">
+      <% if current_user_player.cards.count == 1 && !current_user_player.runo? %>
+        <%= button_to 'rUNO!', game_turn_path(game, play: 'runo'), class: 'runo-button' %>
       <% end %>
-    </ul>
+      <ul class="cards" data-game-target="playerCards">
+        <% current_user_player.cards.each do |card| %>
+          <li data-controller="card" class="
+            card
+            card-<%= card.color %>
+            <%= class_names(
+              playable: your_turn && game.place?(card),
+              unplayable: your_turn && !game.place?(card)
+            ) %>
+          ">
+            <% if your_turn && game.place?(card) %>
+              <% if card.wild? %>
+                <button data-action="card#open" class="card-button">
+                  <%= inline_card(card) %>
+                </button>
+                <dialog data-card-target="dialog">
+                  <% Card::COLORS.each do |color| %>
+                    <%= button_to color.capitalize, game_turn_path(game, play: 'card', card_id: card.id, color:, data: { action: 'game#play' }) %>
+                  <% end %>
+                </dialog>
+              <% else %>
+                <%= button_to game_turn_path(game, play: 'card', card_id: card.id), class: 'card-button', form: { class: 'card-form' }, data: { action: 'game#play' } do %>
+                  <%= inline_card(card) %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <%= inline_card(card) %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
   <% when "finished" %>
     <h2><%= game.winner.email %> wins!</h2>
   <% when "abandoned" %>

@@ -86,6 +86,10 @@ class Game < ApplicationRecord
     players.order(created_at: :asc)[last_player_index]
   end
 
+  def player_index_of(player)
+    players.order(created_at: :asc).index(player)
+  end
+
   def next_player
     self.player_index = (self.player_index + self.dir) % players.length
   end
