@@ -105,7 +105,7 @@ class Game < ApplicationRecord
       broadcast_replace_to "games", target: "game_#{id}", partial: "games/lobby_game", locals: { game: self }
     end
     users.each do |user|
-      broadcast_replace_to "game_#{id}_#{user.id}", locals: { current_user: user, last_play: last_player && last_player.user != user }
+      broadcast_replace_to "game_#{id}_#{user.id}", locals: { game: self, current_user: user, last_play: last_player && last_player.user != user }
     end
   end
 
