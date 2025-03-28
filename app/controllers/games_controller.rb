@@ -35,5 +35,4 @@ class GamesController < ApplicationController
     def set_game
       @game = Game.find(params.expect(:id))
     end
-
 end
