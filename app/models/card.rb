@@ -6,7 +6,7 @@ class Card
   attribute :id, :string
   attribute :face, :string
   attribute :plus, :integer, default: 0
-  enum :color, [*COLORS, :wild]
+  enum :color, [ *COLORS, :wild ]
 
   validates :face, :plus, :color, presence: true
 
