@@ -37,5 +37,4 @@ class Card
       face == other.face
     end
   end
-
 end
