@@ -6,14 +6,14 @@ class PlayersController < ApplicationController
     @game.players << Player.new(user: current_user)
     @game.broadcast
 
-    redirect_to @game, notice: "Game was successfully joined!"
+    head :no_content
   end
 
   def destroy
     @game.players.find_by(user: current_user).destroy
-    @game.broadcast
+    @game.broadcast(current_user)
 
-    redirect_to @game, notice: "Game was successfully left!"
+    head :no_content
   end
 
   private

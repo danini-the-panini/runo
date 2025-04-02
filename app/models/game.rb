@@ -97,19 +97,80 @@ class Game < ApplicationRecord
     self.dir *= -1
   end
 
-  def broadcast
+  def user_stream(user)
+    "game_#{id}_#{user.id}"
+  end
+
+  def player_stream(player)
+    user_stream(player.user)
+  end
+
+  def broadcast(*other_users)
     if abandoned?
-      broadcast_remove_to "games", target: "game_#{id}"
+      LobbyChannel.broadcast_to(Game, { type: "destroy", id: })
     else
-      broadcast_replace_to "games", target: "game_#{id}", partial: "games/lobby_game", locals: { game: self }
+      LobbyChannel.broadcast_to(Game, { type: "update", game: lobby_data })
     end
-    users.each do |user|
-      broadcast_replace_to "game_#{id}_#{user.id}", locals: { game: self, current_user: user, last_play: last_player && last_player.user != user }
+    players.each do
+      ActionCable.server.broadcast(player_stream(it), player_data(it))
+    end
+    other_users.each do
+      ActionCable.server.broadcast(user_stream(it), user_data(it))
     end
   end
 
   def broadcast_to_lobby
-    broadcast_append_to "games", partial: "games/lobby_game", locals: { game: self }
+    LobbyChannel.broadcast_to(Game, { type: "create", game: lobby_data })
+  end
+
+  def lobby_data
+    { id:, player_count: players.count }
+  end
+
+  def user_data(player_user)
+    player_data(players.find_by(user: player_user))
+  end
+
+  def player_data(player)
+    data = {
+      id:, status:,
+      user: user.email,
+      joined: players.include?(player),
+      yours: player&.user == user
+    }
+
+    case status
+    when 'lobby'
+      data.merge!(
+        players: players
+          .order(created_at: :asc)
+          .map { { id: it.id, name: it.user.email } }
+      )
+    when 'playing'
+      your_turn = player == current_player
+      can_draw = your_turn && (plus > 0 || player.cards.all?{ !place?(it) })
+      data.merge!(
+        deck_size: deck.count,
+        discard_size: discard.count,
+        top: top.as_json,
+        cards: player.cards.map { it.as_json.merge(place: your_turn && place?(it)) },
+        plus:, color:, dir:, can_draw:, your_turn:,
+        runo: player.runo?,
+        players: players.order(created_at: :asc)
+          .reject { it == player }
+          .map { {
+            id: it.id,
+            name: it.user.email,
+            card_count: it.cards.count,
+            current: it == current_player,
+            runo: it.runo?
+          } }
+      )
+    when 'finished'
+      data[:winner] = winner == player ? 'you' : winner.user.email
+    end
+
+    data.deep_transform_keys { it.to_s.camelize(:lower) }
   end
 
   private

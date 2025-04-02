@@ -15,15 +15,13 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= vite_client_tag %>
-    <%= vite_javascript_tag 'application.ts' %>
-
+    <%= vite_typescript_tag "inertia" %>
+    <%= inertia_ssr_head %>
   </head>
 
   <body>
     <%= render "layouts/common" %>
-  
-    <div id="app">
-      <%= yield %>
-    </div>
+
+    <%= yield %>
   </body>
 </html>

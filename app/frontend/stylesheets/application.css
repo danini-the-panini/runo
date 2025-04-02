@@ -41,7 +41,25 @@ nav {
   text-align: right;
 }
 
-main {
+nav form {
+  display: contents;
+}
+
+nav button {
+  background: transparent;
+  display: inline-block;
+  border: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #6666FF;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+#app {
   display: flex;
   flex-direction: column;
   justify-content: center;
