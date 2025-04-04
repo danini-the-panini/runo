@@ -64,7 +64,7 @@ class TurnsController < ApplicationController
     end
 
     @game.save!
-    redirect_to @game
+    render json: @game.user_data(current_user)
   end
 
   private

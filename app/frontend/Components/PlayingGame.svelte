@@ -1,8 +1,14 @@
 <script>
+  import turnRoutes from "../api/TurnsApi";
   import Card from "../Components/Card.svelte";
   import CardBackSvg from "../assets/images/cards/back.svg?raw";
 
-  const { game } = $props();
+  const { game, update } = $props();
+
+  async function play(card) {
+    const data = await turnRoutes.create({ params: { game_id: game.id }, data: { play: "card", card_id: card.id } })
+    update(data);
+  }
 </script>
 
 <h2>

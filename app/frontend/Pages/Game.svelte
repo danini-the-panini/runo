@@ -12,9 +12,15 @@
 
   let { game } = $props();
 
+  let gameState = $state(game);
+
   async function abandon() {
     await gameRoutes.destroy(game);
     router.visit("/");
+  }
+
+  function update(game) {
+    gameState = game;
   }
 
   let subscription = consumer.subscriptions.create({
@@ -23,7 +29,7 @@
   }, {
     received(data) {
       console.log(data);
-      game = data;
+      update(data)
     }
   });
 
@@ -35,16 +41,16 @@
 <h1>{game.user}'s game</h1>
 
 {#if game.status === "lobby"}
-  <LobbyGame game={game} />
+  <LobbyGame game={gameState} />
 {:else if game.status === "playing"}
-  <PlayingGame game={game} />
+  <PlayingGame game={gameState} update={update} />
 {:else if game.status === "finished"}
-  <FinishedGame game={game} />
+  <FinishedGame game={gameState} />
 {:else if game.status === "abandoned"}
   <AbandonedGame />
 {/if}
 
-{#if game.yours && (game.status === "lobby" || game.status === "playing")}
+{#if gameState.yours && (gameState.status === "lobby" || gameState.status === "playing")}
   <button onclick={abandon}>Abandon</button>
 {/if}
 

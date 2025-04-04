@@ -1,6 +1,5 @@
 <script>
-  const cardSvgs = import.meta.glob("../assets/images/cards/*.svg", { as: "raw" });
-  console.log(cardSvgs)
+  const cardSvgs = import.meta.glob("../assets/images/cards/*.svg", { query: "?raw", import: "default" });
 
   const { card } = $props();
   let name = `../assets/images/cards/${card.face}`;
